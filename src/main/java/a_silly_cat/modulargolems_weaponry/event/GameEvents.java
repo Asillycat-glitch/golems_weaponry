@@ -1,7 +1,7 @@
 package a_silly_cat.modulargolems_weaponry.event;
 
 // 原有 import 保持不变
-import a_silly_cat.modulargolems_weaponry.modulargolems_weaponry;
+import a_silly_cat.modulargolems_weaponry.mgwe;
 import a_silly_cat.modulargolems_weaponry.capability.ProficiencyCounterProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -16,14 +16,14 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = modulargolems_weaponry.MODID)
+@Mod.EventBusSubscriber(modid = mgwe.MODID)
 public class GameEvents {
 
     @SubscribeEvent
     public static void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player) {
             event.addCapability(
-                    new ResourceLocation(modulargolems_weaponry.MODID, "proficiency_counter"),
+                    new ResourceLocation(mgwe.MODID, "proficiency_counter"),
                     new ProficiencyCounterProvider()
             );
         }
