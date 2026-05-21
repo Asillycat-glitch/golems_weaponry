@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Specification-Title: goar
-Specification-Vendor: 
-Specification-Version: 1
-Implementation-Title: golems_arsenal
-Implementation-Version: 1.0-SNAPSHOT
-Implementation-Vendor: 
-Implementation-Timestamp: 2026-05-21T21:24:49+0800
-
