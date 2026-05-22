@@ -1,21 +1,14 @@
+// 文件路径: capability/ProficiencyCounterProvider.java
 package a_silly_cat.modulargolems_weaponry.capability;
 
-import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class ProficiencyCounterProvider implements ICapabilityProvider {
-    public static final Capability<IProficiencyCounter> KILL_COUNTER_CAP = CapabilityManager.get(new CapabilityToken<>() {});
-    private final ProficiencyCounter instance = new ProficiencyCounter();
-    private final LazyOptional<IProficiencyCounter> lazyOptional = LazyOptional.of(() -> instance);
+public class ProficiencyCounterProvider {
+    // 保留玩家端能力（用于存储 points）
+    public static final Capability<IProficiencyCounter> PLAYER_COUNTER_CAP = CapabilityManager.get(new CapabilityToken<>() {});
 
-    @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        return cap == KILL_COUNTER_CAP ? lazyOptional.cast() : LazyOptional.empty();
-    }
+    // 新增物品端能力（用于存储专精许可的 levels）
+    public static final Capability<IProficiencyItemCounter> ITEM_COUNTER_CAP = CapabilityManager.get(new CapabilityToken<>() {});
 }

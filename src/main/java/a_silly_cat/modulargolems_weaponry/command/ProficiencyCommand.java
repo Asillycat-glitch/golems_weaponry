@@ -16,7 +16,7 @@ public class ProficiencyCommand {
         dispatcher.register(
                 Commands.literal("proficiency")
                         .requires(source -> source.hasPermission(2))
-                        .then(Commands.argument("player", EntityArgument.player())
+                        .then(Commands.argument("target", EntityArgument.player())
                                 .executes(ProficiencyCommand::showProficiency))
                         .executes(ctx -> {
                             ServerPlayer player = ctx.getSource().getPlayerOrException();
@@ -27,7 +27,7 @@ public class ProficiencyCommand {
 
     private static int showProficiency(CommandContext<CommandSourceStack> ctx) {
         try {
-            ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
+            ServerPlayer target = EntityArgument.getPlayer(ctx, "target");
             return showProficiencyFor(target, ctx.getSource());
         } catch (Exception e) {
             ctx.getSource().sendFailure(Component.literal("Player not found!"));
@@ -36,15 +36,12 @@ public class ProficiencyCommand {
     }
 
     private static int showProficiencyFor(ServerPlayer player, CommandSourceStack source) {
-        IProficiencyCounter cap = player.getCapability(ProficiencyCounterProvider.KILL_COUNTER_CAP).resolve().orElse(null);
-        if (cap != null) {
+        var capOpt = player.getCapability(ProficiencyCounterProvider.PLAYER_COUNTER_CAP).resolve();
+        if (capOpt.isPresent()) {
+            int points = capOpt.get().getPoints();
             source.sendSuccess(() -> Component.literal(
-                    "§a%s: §fKills %d/%d | Level %d/%d".formatted(
-                            player.getName().getString(),
-                            cap.getCurrentKills(),
-                            cap.getRequiredKills(),
-                            cap.getLevel(),
-                            cap.getMaxLevel()
+                    "§a%s §fhas §e%d §fproficiency points.".formatted(
+                            player.getName().getString(), points
                     )
             ), false);
         } else {

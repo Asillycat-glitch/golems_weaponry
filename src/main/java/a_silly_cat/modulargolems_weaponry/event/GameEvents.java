@@ -1,6 +1,8 @@
+// event/GameEvents.java
 package a_silly_cat.modulargolems_weaponry.event;
 
 import a_silly_cat.modulargolems_weaponry.mgwe;
+import a_silly_cat.modulargolems_weaponry.capability.PlayerProficiencyProvider;
 import a_silly_cat.modulargolems_weaponry.capability.ProficiencyCounterProvider;
 import a_silly_cat.modulargolems_weaponry.command.ProficiencyCommand;
 import net.minecraft.resources.ResourceLocation;
@@ -10,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +29,7 @@ public class GameEvents {
         if (event.getObject() instanceof Player) {
             event.addCapability(
                     new ResourceLocation(mgwe.MODID, "proficiency_counter"),
-                    new ProficiencyCounterProvider()
+                    new PlayerProficiencyProvider()   // 实现了 ICapabilityProvider
             );
         }
     }
@@ -46,11 +49,26 @@ public class GameEvents {
         }
 
         if (player != null) {
-            player.getCapability(ProficiencyCounterProvider.KILL_COUNTER_CAP).ifPresent(cap -> cap.addKill(1));
+            // 改为 PLAYER_COUNTER_CAP 和 addPoints
+            player.getCapability(ProficiencyCounterProvider.PLAYER_COUNTER_CAP)
+                    .ifPresent(cap -> cap.addPoints(1));
+        }
+    }
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (!event.isWasDeath()) { // 非死亡克隆（如维度穿越）
+            event.getOriginal().reviveCaps(); // 重要：先复活旧玩家的 Capability
+            event.getOriginal().getCapability(ProficiencyCounterProvider.PLAYER_COUNTER_CAP).ifPresent(oldCap -> {
+                event.getEntity().getCapability(ProficiencyCounterProvider.PLAYER_COUNTER_CAP).ifPresent(newCap -> {
+                    // 如果你有一个复制方法，调用它；或者直接通过 NBT 复制
+                    // 例如：newCap.deserializeNBT(oldCap.serializeNBT());
+                    // 但 ProficiencyCounter 可能没有直接暴露，可以在接口中增加 copyFrom 方法
+                });
+            });
+            event.getOriginal().invalidateCaps();
         }
     }
 
-    // 注册指令
     @SubscribeEvent
     public static void registerCommands(RegisterCommandsEvent event) {
         ProficiencyCommand.register(event.getDispatcher());

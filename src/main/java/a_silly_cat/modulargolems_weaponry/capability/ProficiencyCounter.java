@@ -1,60 +1,52 @@
+// 文件路径: capability/ProficiencyCounter.java
 package a_silly_cat.modulargolems_weaponry.capability;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public class ProficiencyCounter implements IProficiencyCounter, INBTSerializable<CompoundTag> {
-    private int currentKills = 0;
-    private int requiredKills = 100;   // 可通过配置文件调整
-    private int currentLevel = 0;
-    private int maxLevel = 10;          // 可通过配置文件调整
+    // 核心改动：将 currentKills 和 requiredKills 合并为无上限的 points
+    private int points = 0;
+
+    // 建议保留 requiredKills 作为升级消耗基数（例如：每升1级消耗100点）
+    private final int BASE_COST = 100;
 
     @Override
-    public void addKill(int amount) {
-        this.currentKills += amount;
-        if (this.currentKills >= this.requiredKills) {
-            checkAndUpgrade();
-        }
+    public void addPoints(int amount) {
+        this.points += amount;
+        // 移除所有升级逻辑
     }
 
-    @Override
-    public void checkAndUpgrade() {
-        while (currentKills >= requiredKills && currentLevel < maxLevel) {
-            currentKills -= requiredKills;
-            currentLevel++;
-            requiredKills = 100 + currentLevel * 50;   // 公式可配置
+    // 新增方法：消耗 points 来升级物品
+    public boolean tryUpgradeItem(IProficiencyItemCounter itemCap) {
+        int cost = getUpgradeCost(itemCap.getLevel());
+        if (this.points >= cost) {
+            this.points -= cost;
+            itemCap.setLevel(itemCap.getLevel() + 1);
+            return true;
         }
-        // 限制击杀数不超过需求太多，防止溢出
-        if (currentKills > requiredKills) currentKills = requiredKills;
+        return false;
+    }
+
+    // 新增方法：获取升级所需的点数成本（可根据设计调整公式）
+    private int getUpgradeCost(int currentLevel) {
+        return BASE_COST + currentLevel * 50;
     }
 
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag tag = new CompoundTag();
-        tag.putInt("Kills", currentKills);
-        tag.putInt("Required", requiredKills);
-        tag.putInt("Level", currentLevel);
-        tag.putInt("MaxLevel", maxLevel);
+        tag.putInt("Points", points);
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        this.currentKills = tag.getInt("Kills");
-        this.requiredKills = tag.getInt("Required");
-        this.currentLevel = tag.getInt("Level");
-        this.maxLevel = tag.getInt("MaxLevel");
+        this.points = tag.getInt("Points");
     }
-    @Override
-    public int getCurrentKills() { return currentKills; }
 
     @Override
-    public int getRequiredKills() { return requiredKills; }
-
-    @Override
-    public int getLevel() { return currentLevel; }
-
-    @Override
-    public int getMaxLevel() { return maxLevel; }
-
+    public int getPoints() {
+        return points;
+    }
 }
