@@ -1,0 +1,8 @@
+{
+  "size": 1,
+  "icon": "curios:slot/empty_proficiency_slot",
+  "priority": 100,
+  "visible": true,
+  "replace": false,
+  "use_native_gui": true
+}
