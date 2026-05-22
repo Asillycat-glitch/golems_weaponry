@@ -1,0 +1,8 @@
+{
+  "type": "mgwe:proficiency_template",
+  "id": "sword",
+  "maxLevel": 10,
+  "attackPerLevel": 3.0,
+  "thresholdLevel": 10,
+  "bonusDamageMultiplier": 0.2
+}
