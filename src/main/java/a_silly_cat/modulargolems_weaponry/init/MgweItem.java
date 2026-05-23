@@ -1,5 +1,6 @@
 package a_silly_cat.modulargolems_weaponry.init;
 
+import a_silly_cat.modulargolems_weaponry.item.CommandStaffItem;
 import a_silly_cat.modulargolems_weaponry.mgwe;
 import a_silly_cat.modulargolems_weaponry.item.ProficiencyTrinketItem;
 import dev.xkmc.modulargolems.content.item.upgrade.SimpleUpgradeItem;
@@ -15,7 +16,8 @@ public class MgweItem {
     public static final RegistryObject<SimpleUpgradeItem> Kill_streak;
     // 剑专精现在是一个通用饰品
     public static final RegistryObject<ProficiencyTrinketItem> SWORD_PROFICIENCY;
-
+    public static final RegistryObject<Item> ARMOR_DISTRIBUTION_UPGRADE;
+    public static final RegistryObject<Item> COMMAND_STAFF;
     static {
         Kill_streak = mgwe.ITEMS.register("kill_streak",
                 () -> new SimpleUpgradeItem(new Item.Properties(),
@@ -24,6 +26,8 @@ public class MgweItem {
                 () -> new ProficiencyTrinketItem(new Item.Properties().stacksTo(1),
                         "sword", 2.0, 5, 0.25f)
         );
+        ARMOR_DISTRIBUTION_UPGRADE = mgwe.ITEMS.register("armor_distribution_upgrade", () -> new SimpleUpgradeItem(new Item.Properties(), () -> MgweModifier.ARMOR_DISTRIBUTION.get(), 1, false));
+        COMMAND_STAFF = mgwe.ITEMS.register("command_staff", () -> new CommandStaffItem(new Item.Properties().stacksTo(1)));
     }
 
     public static void register() {
@@ -37,6 +41,8 @@ public class MgweItem {
             if (event.getTabKey() == GolemItems.UPGRADES.getKey()) {
                 event.accept(Kill_streak.get());
                 event.accept(SWORD_PROFICIENCY.get());
+                event.accept(ARMOR_DISTRIBUTION_UPGRADE.get());
+                event.accept(COMMAND_STAFF.get());
             }
         }
     }
