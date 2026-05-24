@@ -1,9 +1,0 @@
-{
-  "modifier.mgwe.proficiency.detail": "Proficiency %1$s: +%2$s Attack Damage",
-  "modifier.mgwe.proficiency.bonus_detail": "At Level 10: Additional %1$s%% Damage",
-  "item.mgwe.sword_proficiency": "Sword Proficiency License",
-  "item.mgwe.axe_proficiency": "Axe Proficiency License",
-  "item.mgwe.bow_proficiency": "Bow Proficiency License",
-  "modifier.mgwe.killstreak.tooltip": "Killstreak Level %s",
-  "modifier.mgwe.killstreak.detail": "Increases damage based on killstreak."
-}
