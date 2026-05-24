@@ -1,0 +1,11 @@
+{
+  "modifier.mgwe.proficiency.detail": "Proficiency %1$s: +%2$s Attack Damage",
+  "modifier.mgwe.proficiency.bonus_detail": "At Level 10: Additional %1$s%% Damage",
+  "item.mgwe.sword_proficiency": "剑专精凭证",
+  "item.mgwe.axe_proficiency": "斧专精凭证",
+  "item.mgwe.bow_proficiency": "弓专精凭证",
+  "item.mgwe.infinity_edge":"无尽之刃",
+  "item.mgwe.infinity_edge.passive": "达到60%暴击率后获得35%暴击伤害",
+  "curios.identifier.proficiency": "熟练度凭证",
+  "curios.modifiers.proficiency": "佩戴熟练度凭证时："
+}
