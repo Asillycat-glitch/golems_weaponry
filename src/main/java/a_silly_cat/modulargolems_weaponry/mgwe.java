@@ -1,5 +1,6 @@
 package a_silly_cat.modulargolems_weaponry;
 
+import a_silly_cat.modulargolems_weaponry.compat.CompatHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -69,15 +70,18 @@ public class mgwe {
         MinecraftForge.EVENT_BUS.register(this);
         modEventBus.addListener(this::addCreative);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-
         MgweModifier.register();
         MgweItem.register();
+        modEventBus.addListener(this::onCommonSetup);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("HELLO FROM COMMON SETUP");
     }
-
+    private void onCommonSetup(FMLCommonSetupEvent event) {
+        // 在所有模组都加载完毕后进行兼容性初始化
+        CompatHandler.init();
+    }
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS)
             event.accept(EXAMPLE_BLOCK_ITEM);

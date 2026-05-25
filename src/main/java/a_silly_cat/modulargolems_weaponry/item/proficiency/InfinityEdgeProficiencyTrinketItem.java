@@ -31,7 +31,7 @@ public class InfinityEdgeProficiencyTrinketItem extends ProficiencyTrinketItem i
         Multimap<Attribute, AttributeModifier> atts = LinkedHashMultimap.create();
 
         int level = getLevel(stack);
-
+        if (level == 0) return atts; // 0级无任何属性
         // 攻击力：1级 +35，10级 +70，线性增长
         double attackBonus = 35.0 + (level - 1) * (35.0 / 9.0);
         atts.put(Attributes.ATTACK_DAMAGE,

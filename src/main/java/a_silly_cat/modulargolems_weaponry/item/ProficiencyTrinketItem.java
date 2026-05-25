@@ -52,12 +52,18 @@ public abstract class ProficiencyTrinketItem extends Item {
         ItemStack stack = player.getItemInHand(hand);
         if (player.isShiftKeyDown()) {
             if (!level.isClientSide) {
+                int currentLevel = getLevel(stack);
+                // 限制最大等级为 10
+                if (currentLevel >= 10) {
+                    player.displayClientMessage(Component.literal("已达到最高等级！"), true);
+                    return InteractionResultHolder.success(stack);
+                }
                 LazyOptional<IProficiencyCounter> cap = player.getCapability(ProficiencyCounterProvider.PLAYER_COUNTER_CAP);
                 cap.ifPresent(counter -> {
                     if (counter.tryUpgradeItem(stack)) {
                         player.displayClientMessage(Component.literal("升级成功！当前等级: " + getLevel(stack)), true);
                     } else {
-                        player.displayClientMessage(Component.literal("点数不足！需要: " + getUpgradeCost(getLevel(stack))), true);
+                        player.displayClientMessage(Component.literal("点数不足！需要: " + getUpgradeCost(currentLevel)), true);
                     }
                 });
             }
