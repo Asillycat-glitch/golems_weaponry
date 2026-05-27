@@ -1,0 +1,12 @@
+{
+  "values":[
+    {
+      "id": "spore:greatsword",
+      "required": false
+    },
+    {
+      "id": "spore:mace",
+      "required": false
+    }
+  ]
+}

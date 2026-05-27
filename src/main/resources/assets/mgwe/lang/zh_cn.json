@@ -3,5 +3,11 @@
   "item.mgwe.axe_proficiency": "斧专精",
   "item.mgwe.bow_proficiency": "弓专精",
   "item.mgwe.infinity_edge":"无尽之刃",
-  "item.mgwe.cull_proficiency": "夺萃之镰"
+  "item.mgwe.cull_proficiency": "夺萃之镰",
+  "modifier.haymaker": "蓄意轰拳",
+  "modifier.haymaker.desc": "将受到的伤害转化为豪意值（上限50%最大生命值）。停止受击4秒或豪意值满后，向前方扇形区域释放一次轰击，造成等同于豪意值的绝对真实伤害。",
+  "item.modulargolems_weaponry.haymaker_upgrade": "蓄意轰拳升级",
+  "death.attack.haymaker": "%1$s 被蓄意轰拳击碎",
+  "death.attack.haymaker.player": "%1$s 被 %2$s 的蓄意轰拳命中"
+
 }
