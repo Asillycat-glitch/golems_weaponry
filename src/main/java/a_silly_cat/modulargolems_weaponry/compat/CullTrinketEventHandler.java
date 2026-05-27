@@ -17,6 +17,7 @@ import net.minecraftforge.fml.ModList;
 import top.theillusivec4.curios.api.CuriosApi;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
+import dev.xkmc.golemmagicka.content.entity.GolemMagicData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,53 +101,80 @@ public class CullTrinketEventHandler {
     // ======================================================================
     //  Golem Magicka 兼容模块（仅当 golemmagicka 加载时才被注册）
     // ======================================================================
+    /**
+     * Golem Magicka 兼容模块
+     *
+     * 修复思路：
+     * 1. 通过 GolemMagicData.getMagicData() 获取傀儡的 MagicData，直接为傀儡回蓝。
+     * 2. 在 LivingHurtEvent 中，用 attacked 的持久化数据来判断增伤，而非依赖玩家。
+     */
     static class GolemCompatHandler {
         private static final Map<UUID, Boolean> GOLEM_CASTING_STATE = new HashMap<>();
 
-        // 检测傀儡施法开始
+        /**
+         * 监听玩家周围的傀儡施法
+         */
         @SubscribeEvent
         public void onPlayerTick(TickEvent.PlayerTickEvent event) {
             if (event.phase != TickEvent.Phase.END || event.player.level().isClientSide) return;
             Player player = event.player;
 
-            for (var golem : player.level().getEntitiesOfClass(AbstractGolemEntity.class,
-                    player.getBoundingBox().inflate(32))) {
+            // 获取玩家周围的所有傀儡
+            for (var golem : player.level().getEntitiesOfClass(AbstractGolemEntity.class, player.getBoundingBox().inflate(32))) {
+                // 检查是否为 Golem Magicka 傀儡
                 if (!(golem instanceof IGolemMagicka magicka)) continue;
+                // 检查是否是玩家的傀儡
                 if (!player.getUUID().equals(getGolemOwnerId(golem))) continue;
 
-                var magicData = magicka.magicka$getGolemMagicData();
+                GolemMagicData golemMagicData = magicka.magicka$getGolemMagicData();
+                MagicData magicData = golemMagicData.getMagicData(); // 关键修复：获取傀儡的魔力数据
+
                 boolean isCasting = magicData.isCasting();
                 boolean wasCasting = GOLEM_CASTING_STATE.getOrDefault(golem.getUUID(), false);
 
                 if (isCasting && !wasCasting) {
-                    // 傀儡施法开始，触发主人效果
-                    CullTrinketEventHandler handler = new CullTrinketEventHandler();
-                    handler.applyEffect(player);
-                }
+                    // 1. 为傀儡恢复魔力
+                    float maxMana = (float) golem.getAttributeValue(AttributeRegistry.MAX_MANA.get());
+                    float currentMana = magicData.getMana();
+                    float newMana = Math.min(currentMana + 20.0F, maxMana);
+                    magicData.setMana(newMana);
 
+                    // 2. 在傀儡身上标记下次攻击增伤，而非玩家
+                    golem.getPersistentData().putLong("CullNextHitBonus", golem.level().getGameTime());
+                }
                 GOLEM_CASTING_STATE.put(golem.getUUID(), isCasting);
             }
         }
 
-        // 傀儡攻击增伤
+        /**
+         * 监听傀儡造成的伤害，触发增伤
+         */
         @SubscribeEvent
         public void onLivingHurt(LivingHurtEvent event) {
+            // 判断攻击来源是否为实体
             if (!(event.getSource().getEntity() instanceof LivingEntity attacker)) return;
-            UUID ownerId = getGolemOwnerId(attacker);
-            if (ownerId == null) return;
 
-            Player player = attacker.level().getPlayerByUUID(ownerId);
-            if (player == null) return;
+            // 关键修复：直接检查攻击者（傀儡）身上的增伤标记
+            if (!(attacker instanceof AbstractGolemEntity<?, ?>)) return;
 
-            CullTrinketEventHandler handler = new CullTrinketEventHandler();
-            handler.applyBonus(player, event);
+            long currentTime = attacker.level().getGameTime();
+            long bonusTime = attacker.getPersistentData().getLong("CullNextHitBonus");
+
+            if (bonusTime == 0 || currentTime - bonusTime > 40) return; // 2秒内有效
+
+            // 移除标记并应用伤害增幅
+            attacker.getPersistentData().remove("CullNextHitBonus");
+            event.setAmount(event.getAmount() * 1.2F);
         }
 
+        /**
+         * 获取傀儡的主人 UUID
+         */
         private static UUID getGolemOwnerId(LivingEntity entity) {
             if (entity instanceof AbstractGolemEntity<?, ?> golem) {
                 return golem.getOwnerUUID();
             }
-            // 备用反射（若其它实体也实现了 getOwnerUUID）
+            // 备用反射
             try {
                 var method = entity.getClass().getMethod("getOwnerUUID");
                 return (UUID) method.invoke(entity);

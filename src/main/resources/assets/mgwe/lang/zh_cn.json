@@ -1,5 +1,7 @@
 {
   "item.mgwe.sword_proficiency": "剑专精",
   "item.mgwe.axe_proficiency": "斧专精",
-  "item.mgwe.bow_proficiency": "弓专精"
+  "item.mgwe.bow_proficiency": "弓专精",
+  "item.mgwe.infinity_edge":"无尽之刃",
+  "item.mgwe.cull_proficiency": "夺萃之镰"
 }
